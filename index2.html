@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>클릭 & 중력 효과</title>
+    <link rel="stylesheet" href="style.css"> 
+</head>
+<body>
+    <button id="menu-toggle" class="menu-toggle">
+        <span class="triangle-left"></span>
+    </button>
+
+    <nav id="menu-list" class="hidden">
+        <ul>
+            <li><a href="#">대화합시다</a></li>
+            <li><a href="#">정보의 쓰나미</a></li>
+            <li><a href="#">콘라드 되기</a></li>
+            <li><a href="#">치유의 스토리텔링</a></li>
+        </ul>
+    </nav>
+
+    <div id="text-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+
+/* style.css */
+
+/* --- 폰트 정의 --- */
+@font-face {
+    font-family: 'BookkGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Lt.woff2') format('woff2');
+    font-weight: 300;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'BookkGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
+* {
+    box-sizing: border-box; 
+}
+
+body {
+    background-color: white; 
+    margin: 0; 
+    padding: 0;
+    min-height: 100vh;
+    overflow: hidden; 
+    font-family: 'BookkGothic', sans-serif; 
+}
+
+/* --- 텍스트 효과 스타일 --- */
+#text-container {
+    position: absolute; 
+    top: 20px; 
+    left: 20px;
+    font-family: 'BookkGothic', sans-serif; 
+    color: black; 
+    font-size: 10vw; 
+    font-weight: 700; 
+    white-space: nowrap;
+    user-select: none; 
+    z-index: 1; /* 가장 아래 */
+}
+
+.jamo {
+    display: inline-block;
+    transition: none;
+    will-change: transform; 
+    line-height: 1; 
+}
+
+#text-container.ready-to-click {
+    transition: transform 0.3s ease-out; 
+    cursor: pointer; 
+}
+
+#text-container.ready-to-click:hover {
+    transform: scale(1.03); 
+}
+
+/* --- 메뉴 토글 및 리스트 스타일 --- */
+
+/* 1. 토글 버튼 */
+.menu-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border: 1px solid black; 
+    background: white; 
+    cursor: pointer;
+    z-index: 1000; /* 텍스트보다 훨씬 위에 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    transition: background-color 0.2s;
+}
+
+/* 2. 버튼 안의 왼쪽 화살표 */
+.triangle-left {
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent; 
+    border-right: 18px solid black; 
+    transition: transform 0.3s ease; 
+}
+
+/* 화살표 회전 (아래 방향) */
+.menu-toggle.active .triangle-left {
+    transform: rotate(-90deg);
+}
+
+/* 3. 메뉴 리스트 박스 */
+#menu-list {
+    position: fixed;
+    top: 80px; 
+    right: 20px;
+    background-color: white;
+    border: 1px solid black;
+    padding: 15px 25px;
+    z-index: 999;
+    min-width: 180px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; 
+}
+
+/* 메뉴 활성화 */
+#menu-list.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#menu-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#menu-list li {
+    margin: 12px 0;
+    text-align: right; 
+}
+
+#menu-list a {
+    text-decoration: none;
+    color: black;
+    font-weight: 700; 
+    font-size: 1rem;
+    font-family: 'BookkGothic', sans-serif; 
+    transition: color 0.2s;
+}
+
+#menu-list a:hover {
+    color: #555;
+    text-decoration: underline;
+}
+
+
+
+// window 'load' 이벤트를 사용하여 폰트/이미지 등 모든 리소스가 로드된 후 실행
+window.addEventListener('load', () => {
+
+    // ==========================================
+    // 1. 메뉴 토글 기능
+    // ==========================================
+    const menuToggle = document.getElementById('menu-toggle');
+    const menuList = document.getElementById('menu-list');
+
+    if (menuToggle && menuList) {
+        menuToggle.addEventListener('click', (e) => {
+            menuList.classList.toggle('active');
+            menuToggle.classList.toggle('active');
+            e.stopPropagation(); 
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!menuToggle.contains(e.target) && !menuList.contains(e.target)) {
+                menuList.classList.remove('active');
+                menuToggle.classList.remove('active');
+            }
+        });
+    }
+
+    // ==========================================
+    // 2. 텍스트 중력 효과
+    // ==========================================
+    const textContainer = document.getElementById('text-container');
+    const originalText = "서사, 위기 속에서"; 
+    const jamoElements = [];
+    
+    const GRAVITY = 0.4; 
+    const FRICTION = 0.99; 
+    const INITIAL_SCATTER = 10; 
+    const BOUNCE = 0.7; 
+    
+    const MOUSE_RADIUS = 150; 
+    const MOUSE_STRENGTH = 2.0; 
+    let isSeparated = false; 
+    let mousePos = { x: 0, y: 0 }; 
+    
+    let viewportWidth = window.innerWidth;
+    let viewportHeight = window.innerHeight;
+
+    window.addEventListener('resize', () => {
+        viewportWidth = window.innerWidth;
+        viewportHeight = window.innerHeight;
+    });
+
+    function setupJamo(text) {
+        const characters = text.split('');
+        textContainer.classList.add('ready-to-click'); 
+
+        characters.forEach((char) => {
+            const jamoSpan = document.createElement('span');
+            jamoSpan.textContent = char === ' ' ? '\u00A0' : char;
+            jamoSpan.className = 'jamo';
+            jamoSpan.style.position = 'relative'; 
+            
+            jamoSpan.jamoData = {
+                x: 0, y: 0, vx: 0, vy: 0, 
+                initialVX: (Math.random() - 0.5) * INITIAL_SCATTER, 
+                initialVY: (Math.random() - 0.5) * INITIAL_SCATTER - 5,
+                isStopped: false,
+                width: 0, height: 0
+            };
+            
+            textContainer.appendChild(jamoSpan);
+            jamoElements.push(jamoSpan);
+        });
+
+        // 폰트가 적용된 후 정확한 크기를 계산하기 위해 약간의 지연 후 측정
+        // requestAnimationFrame을 두 번 호출하여 렌더링 사이클 확보
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                jamoElements.forEach(span => {
+                    const rect = span.getBoundingClientRect();
+                    span.jamoData.width = rect.width;
+                    span.jamoData.height = rect.height;
+                });
+            });
+        });
+    }
+
+    function trackMouse(event) {
+        mousePos.x = event.clientX;
+        mousePos.y = event.clientY;
+    }
+
+    function updateGravity() {
+        if (!isSeparated) {
+            requestAnimationFrame(updateGravity);
+            return;
+        }
+
+        const containerRect = textContainer.getBoundingClientRect();
+
+        jamoElements.forEach(jamo => {
+            const data = jamo.jamoData;
+            
+            const currentAbsX = containerRect.left + jamo.offsetLeft + data.x;
+            const currentAbsY = containerRect.top + jamo.offsetTop + data.y;
+            
+            const jamoCenterX = currentAbsX + data.width / 2;
+            const jamoCenterY = currentAbsY + data.height / 2;
+
+            const dx = jamoCenterX - mousePos.x;
+            const dy = jamoCenterY - mousePos.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+
+            if (distance < MOUSE_RADIUS && distance > 0) {
+                const angle = Math.atan2(dy, dx);
+                const force = MOUSE_STRENGTH * (1 - distance / MOUSE_RADIUS);
+                data.vx += Math.cos(angle) * force;
+                data.vy += Math.sin(angle) * force;
+                data.isStopped = false;
+            }
+
+            if (!data.isStopped) {
+                data.vy += GRAVITY; 
+                if (data.initialVX !== null) { 
+                    data.vx += data.initialVX;
+                    data.vy += data.initialVY;
+                    data.initialVX = null; data.initialVY = null;
+                }
+                
+                data.vx *= FRICTION;
+                data.vy *= FRICTION;
+                data.x += data.vx;
+                data.y += data.vy;
+
+                // 벽 충돌 (화면 전체 너비/높이 기준)
+                if (currentAbsX < 0) {
+                    data.x = - (containerRect.left + jamo.offsetLeft);
+                    data.vx *= -BOUNCE;
+                } 
+                else if (currentAbsX + data.width > viewportWidth) {
+                    data.x = viewportWidth - (containerRect.left + jamo.offsetLeft) - data.width;
+                    data.vx *= -BOUNCE;
+                }
+
+                if (currentAbsY + data.height > viewportHeight) {
+                    data.y = viewportHeight - (containerRect.top + jamo.offsetTop) - data.height;
+                    data.vy *= -BOUNCE; 
+                    if (Math.abs(data.vy) < 1.0) data.vx *= 0.9; 
+                }
+            }
+            
+            jamo.style.transform = `translate(${data.x}px, ${data.y}px)`;
+        });
+
+        requestAnimationFrame(updateGravity);
+    }
+
+    function startSeparation() {
+        if (!isSeparated) {
+            isSeparated = true;
+            updateGravity();
+            document.addEventListener('mousemove', trackMouse);
+            textContainer.classList.remove('ready-to-click'); 
+        }
+    }
+
+    setupJamo(originalText);
+    textContainer.addEventListener('click', startSeparation);
+});
