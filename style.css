@@ -1,0 +1,145 @@
+/* style.css */
+ 
+/* --- 폰트 정의 --- */
+@font-face {
+    font-family: 'BookkGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Lt.woff2') format('woff2');
+    font-weight: 300;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'BookkGothic';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2302@1.0/BookkGothic-Bd.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
+* {
+    box-sizing: border-box; 
+}
+
+body {
+    background-color: white; 
+    margin: 0; 
+    padding: 0;
+    min-height: 100vh;
+    overflow: hidden; 
+    /* 기본 폰트 설정 */
+    font-family: 'BookkGothic', sans-serif; 
+}
+
+/* --- 텍스트 효과 스타일 --- */
+#text-container {
+    position: absolute; 
+    top: 20px; 
+    left: 20px;
+    font-family: 'BookkGothic', sans-serif; /* 폰트 변경 */
+    color: black; 
+    font-size: 10vw; 
+    font-weight: 700; /* 폰트 최대 굵기에 맞춰 700으로 설정 */
+    white-space: nowrap;
+    user-select: none; 
+    z-index: 1; 
+}
+
+.jamo {
+    display: inline-block;
+    transition: none;
+    will-change: transform; 
+    line-height: 1; 
+}
+
+#text-container.ready-to-click {
+    transition: transform 0.3s ease-out; 
+    cursor: pointer; 
+}
+
+#text-container.ready-to-click:hover {
+    transform: scale(1.03); 
+}
+
+/* --- 메뉴 토글 및 리스트 스타일 --- */
+
+/* 1. 토글 버튼 */
+.menu-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border: 1px solid black; 
+    background: white; 
+    cursor: pointer;
+    z-index: 1000; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    transition: background-color 0.2s;
+}
+
+/* 2. 버튼 안의 왼쪽 화살표 */
+.triangle-left {
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent; 
+    border-right: 18px solid black; 
+    transition: transform 0.3s ease; 
+}
+
+/* 화살표 회전 (아래 방향) */
+.menu-toggle.active .triangle-left {
+    transform: rotate(-90deg);
+}
+
+/* 3. 메뉴 리스트 박스 */
+#menu-list {
+    position: fixed;
+    top: 80px; 
+    right: 20px;
+    background-color: white;
+    border: 1px solid black;
+    padding: 15px 25px;
+    z-index: 999;
+    min-width: 180px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    pointer-events: none; 
+}
+
+/* 메뉴 활성화 */
+#menu-list.active {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+#menu-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#menu-list li {
+    margin: 12px 0;
+    text-align: right; 
+}
+
+#menu-list a {
+    text-decoration: none;
+    color: black;
+    font-weight: 700; /* 폰트 굵게 */
+    font-size: 1rem;
+    font-family: 'BookkGothic', sans-serif; /* 폰트 변경 */
+    transition: color 0.2s;
+}
+
+#menu-list a:hover {
+    color: #555;
+    text-decoration: underline;
+}
